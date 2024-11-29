@@ -4,11 +4,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.theme.FrontendKotlinCompose_MatiasMarcelo_AdiKaliyevTheme
@@ -19,29 +24,60 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FrontendKotlinCompose_MatiasMarcelo_AdiKaliyevTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                InitialPage()
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+// Lista estática de enfermeras
+class Nurse(var user:String, var password:String)
+
+val nurses = ArrayList<Nurse>().apply {
+    add(Nurse("Alberto", "password1"))
+    add(Nurse("Maria", "password2"))
+    add(Nurse("Juan", "password3"))
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    FrontendKotlinCompose_MatiasMarcelo_AdiKaliyevTheme {
-        Greeting("Android")
+fun InitialPage(){
+
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ButtonFindByNamePage()
+        ButtonGetAllPage()
+        ButtonLoginPage()
+
+
     }
+
+}
+
+@Composable
+fun ButtonFindByNamePage() {
+
+    Button(onClick = {}) {
+        Text("Login")
+    }
+
+}
+
+@Composable
+fun ButtonGetAllPage() {
+
+    Button(onClick = {}) {
+        Text("Get All")
+    }
+}
+
+@Composable
+fun ButtonLoginPage() {
+
+    Button(onClick = {}) {
+        Text("Find By Name")
+    }
+
 }
