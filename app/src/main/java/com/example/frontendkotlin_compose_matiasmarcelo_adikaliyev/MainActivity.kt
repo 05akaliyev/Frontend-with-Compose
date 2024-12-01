@@ -1,22 +1,25 @@
 package com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev
 
+import LoginPageForm
+import ShowAllNurses
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.theme.FrontendKotlinCompose_MatiasMarcelo_AdiKaliyevTheme
+import findNurses
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,43 +44,52 @@ val nurses = ArrayList<Nurse>().apply {
 
 @Composable
 fun InitialPage(){
-
+    var loginClicked by remember {
+        mutableStateOf<Boolean>(false) }
+    var getAllClicked by remember {
+        mutableStateOf<Boolean>(false) }
+    var findByNameClicked by remember {
+        mutableStateOf<Boolean>(false) }
     Row(
         modifier = Modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ButtonFindByNamePage()
-        ButtonGetAllPage()
-        ButtonLoginPage()
-
-
+        if (!loginClicked && !getAllClicked && !findByNameClicked) {
+            ButtonLoginPage(onLoginClick = { loginClicked = true })
+            ButtonGetAllPage(onGetAllClick = { getAllClicked = true })
+            ButtonFindByNamePage(onFindByNameClick = { findByNameClicked = true })
+        }
+        if (loginClicked) {
+            LoginPageForm()
+        }
+        if (getAllClicked) {
+            ShowAllNurses()
+        }
+        if (findByNameClicked) {
+            findNurses()
+        }
     }
-
+}
+@Composable
+fun ButtonFindByNamePage(onFindByNameClick: () -> Unit) {
+    Button(onClick = {onFindByNameClick()}) {
+        Text("FindByName")
+    }
 }
 
 @Composable
-fun ButtonFindByNamePage() {
-
-    Button(onClick = {}) {
-        Text("Login")
-    }
-
-}
-
-@Composable
-fun ButtonGetAllPage() {
-
-    Button(onClick = {}) {
+fun ButtonGetAllPage(onGetAllClick: () -> Unit) {
+    Button(onClick = { onGetAllClick()}) {
         Text("Get All")
     }
 }
 
 @Composable
-fun ButtonLoginPage() {
-
-    Button(onClick = {}) {
-        Text("Find By Name")
+fun ButtonLoginPage(onLoginClick: () -> Unit) {
+    Button(onClick = { onLoginClick() }) {
+        Text("Login")
     }
+
 
 }
