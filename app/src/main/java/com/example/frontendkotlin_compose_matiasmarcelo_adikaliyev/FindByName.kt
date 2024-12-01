@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.nurses
-
+//Find Nurse by Name
 @Composable
 fun findNurses() {
     var searchQuery by remember { mutableStateOf("") }
