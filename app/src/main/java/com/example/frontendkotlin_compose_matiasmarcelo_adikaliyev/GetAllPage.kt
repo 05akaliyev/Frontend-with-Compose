@@ -17,7 +17,7 @@ import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.nurses
 
 @Composable
 fun ShowAllNurses(){
-
+//
 //getAll
     Column(
         modifier = Modifier.fillMaxSize(),
