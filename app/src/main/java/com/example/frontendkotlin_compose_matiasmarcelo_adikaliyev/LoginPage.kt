@@ -22,11 +22,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.nurses
 //Login
 //
 @Composable
-fun LoginPageForm(){
+fun LoginPageForm(navController: NavController){
 
     var loginInput by remember{
         mutableStateOf<String>(value = "")
@@ -82,6 +83,14 @@ fun LoginPageForm(){
             Text(text = "Login")
 
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { navController.navigate("Home") }) {
+            Text("Home")
+        }
+
+
 
         if (loginResult != null){
             ResultView(success = loginResult == true)

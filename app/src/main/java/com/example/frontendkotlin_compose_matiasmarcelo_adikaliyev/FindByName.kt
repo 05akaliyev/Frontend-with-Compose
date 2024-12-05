@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,11 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.nurses
 //Find Nurse by Name
 //
 @Composable
-fun findNurses() {
+fun findNurses(navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
     val filteredNurses = nurses.filter { it.user.contains(searchQuery, ignoreCase = true) }
 
@@ -31,7 +33,7 @@ fun findNurses() {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "Find Nurse by Name", fontSize = 28.sp, fontWeight = FontWeight.Bold)
@@ -45,13 +47,18 @@ fun findNurses() {
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        LazyColumn{
             items(filteredNurses.take(3)) { nurse ->
                 Text(text = nurse.user, fontSize = 18.sp, fontWeight = FontWeight.Medium)
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(onClick = { navController.navigate("Home") }) {
+            Text("Home")
+        }
+
     }
+
 }
