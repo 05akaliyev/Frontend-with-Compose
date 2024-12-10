@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,11 +22,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.nurses
+import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.AppViewModel
+import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.Nurse
+
 //Find Nurse by Name
 //
 @Composable
-fun findNurses(navController: NavController) {
+fun findNurses(navController: NavController, viewModel: AppViewModel) {
+    val viewModel:AppViewModel = viewModel
+    var nurses:ArrayList<Nurse> = viewModel.uiState.collectAsState().value.nurses
     var searchQuery by remember { mutableStateOf("") }
     val filteredNurses = nurses.filter { it.user.contains(searchQuery, ignoreCase = true) }
 
