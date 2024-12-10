@@ -36,6 +36,27 @@ import kotlinx.coroutines.flow.asStateFlow
 
 //
 
+// Lista estática de enfermeras
+class Nurse(var user:String, var password:String)
+
+
+data class InfoUiState(val nurses: ArrayList<Nurse> = ArrayList<Nurse>())
+
+class AppViewModel: ViewModel(){
+    private val _uiState = MutableStateFlow(
+        InfoUiState(
+            nurses = arrayListOf(
+                Nurse("Alberto", "password1"),
+                Nurse("Maria", "password2"),
+                Nurse("Juan", "password3")
+            )
+        )
+    )
+    val uiState:StateFlow<InfoUiState> get() = _uiState.asStateFlow()
+
+
+}
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,18 +69,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Lista estática de enfermeras
-class Nurse(var user:String, var password:String)
-
-val nurses = ArrayList<Nurse>().apply {
-    add(Nurse("Alberto", "password1"))
-    add(Nurse("Maria", "password2"))
-    add(Nurse("Juan", "password3"))
-}
-
 @Composable
 fun InitialPage(){
 
+    val viewModel : AppViewModel = AppViewModel()
     val navController = rememberNavController()
 
 
@@ -74,14 +87,14 @@ fun InitialPage(){
     NavHost(navController = navController, startDestination = "Home"){
 
         composable("Login") {
-            LoginPageForm(navController)
+            LoginPageForm(navController,viewModel)
         }
         composable("GetAll") {
-            ShowAllNurses(navController)
+            ShowAllNurses(navController, viewModel)
 
         }
         composable("FindByName"){
-            findNurses(navController)
+            findNurses(navController,viewModel)
 
         }
         composable("Home") {

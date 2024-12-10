@@ -9,6 +9,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,11 +24,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.nurses
+import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.AppViewModel
+import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.Nurse
+
 //Login
 //
 @Composable
-fun LoginPageForm(navController: NavController){
+fun LoginPageForm(navController: NavController,viewModel: AppViewModel){
+    val viewModel:AppViewModel = viewModel
+    var nurses:ArrayList<Nurse> = viewModel.uiState.collectAsState().value.nurses
 
     var loginInput by remember{
         mutableStateOf<String>(value = "")
