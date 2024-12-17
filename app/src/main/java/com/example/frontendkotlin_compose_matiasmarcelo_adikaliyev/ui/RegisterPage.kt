@@ -1,3 +1,6 @@
+package com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -26,66 +30,71 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.AppViewModel
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.Nurse
+import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.R
 
-//Login
-//
 @Composable
-fun LoginPageForm(navController: NavController,viewModel: AppViewModel){
-    val viewModel:AppViewModel = viewModel
+fun RegisterpageForm(navController: NavController, viewModel: AppViewModel){
+    val viewModel: AppViewModel = viewModel
     var nurses:ArrayList<Nurse> = viewModel.uiState.collectAsState().value.nurses
 
-    var loginInput by remember{
+    var registerUserInput by remember {
         mutableStateOf<String>(value = "")
-    }
 
-    var loginResult by remember {
-        mutableStateOf<Boolean?>(null)
     }
-
-    var passwordInput by remember {
+    var registerPasswordInput by remember {
         mutableStateOf<String>(value = "")
+
     }
-
-    var whatShow by remember {
-
-        mutableStateOf<String>(value = "Result")
-    }
-
-    var passwordIsVisible by remember{
+    var passwordIsVisible by remember {
         mutableStateOf<Boolean>(value = false)
     }
+
+    var registerResult by remember {
+        mutableStateOf<Boolean?>(value = null)
+    }
+
 
     Column(modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        LoginUserInput(
-            loginInput = loginInput,
-            onLoginChange = { loginInput = it }
-
-        )
-
-        LoginPasswordInput(
-
-            passwordInput = passwordInput,
-            onPasswordChange = {passwordInput = it},
-            passwordIsVisible = passwordIsVisible,
-            whatShow = whatShow
 
 
+        RegisterUserInput(
+            registerUserInput = registerUserInput,
+            onRegisterUserChange = {registerUserInput = it}
+
+            )
+
+        RegisterPasswordInput(
+            registerPasswordInput = registerPasswordInput,
+            onRegisterPasswordChange = {registerPasswordInput = it},
+            passwordIsVisible = passwordIsVisible
         )
 
         Button(onClick = {
 
-            loginResult = nurses.any{it.user == loginInput && it.password == passwordInput}
+            if (registerUserInput.isNotBlank() && registerPasswordInput.isNotBlank()) {
+                val nurse = Nurse(user = registerUserInput, password = registerPasswordInput)
+                viewModel.addNurse(nurse)
+                navController.navigate("GetAll")
+                registerResult = true
+            } else {
+                registerResult = false
+            }
+
+
+            //registerResult = nurses.any{it.user == registerUserInput && it.password == registerPasswordInput}
+
+
 
         }, modifier = Modifier, colors = ButtonDefaults.buttonColors(
 
             containerColor = Color.Blue
         )) {
 
-            Text(text = "Login")
+            Text(text = "Register")
 
         }
 
@@ -96,47 +105,37 @@ fun LoginPageForm(navController: NavController,viewModel: AppViewModel){
         }
 
 
-
-        if (loginResult != null){
-            ResultView(success = loginResult == true)
-        }
     }
+
+
 
 }
 
-
 @Composable
-fun LoginUserInput(
-    loginInput: String,
-    onLoginChange: (String) -> Unit, // Lambda para manejar el cambio
-    labelId : String = "User"
-)
+fun RegisterUserInput(registerUserInput : String, labelId : String = "User",
+    onRegisterUserChange: (String) -> Unit)
 {
-
-    Text(text = "Login", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-
+    Text(text = "Register", fontSize = 28.sp, fontWeight = FontWeight.Bold)
+    Spacer(modifier = Modifier.height(16.dp))
+    Image(painter = painterResource(id = R.drawable.registroperfil),
+        contentDescription = "registerProfile")
     Spacer(modifier = Modifier.height(16.dp))
 
-    OutlinedTextField(value = loginInput, onValueChange = {
-        onLoginChange(it)
+
+    OutlinedTextField(value = registerUserInput, onValueChange = {
+        onRegisterUserChange(it)
     }, label = {
 
         Text(text = labelId)
+
     })
-    Spacer(modifier = Modifier.height(16.dp))
-
-
-
 }
 
 @Composable
-fun LoginPasswordInput(
-    passwordInput: String,
-    onPasswordChange: (String) -> Unit, // Lambda para manejar el cambio
-    labelId: String = "Password",
-    whatShow: String,
-    passwordIsVisible: Boolean
-){
+fun RegisterPasswordInput(registerPasswordInput : String, labelId : String = "Password",
+    onRegisterPasswordChange: (String) -> Unit,
+    passwordIsVisible : Boolean)
+{
 
     var visualTransformation = if(passwordIsVisible){
         VisualTransformation.None
@@ -147,9 +146,9 @@ fun LoginPasswordInput(
     }
 
     OutlinedTextField(
-        value = passwordInput,
+        value = registerPasswordInput,
         onValueChange = {
-            onPasswordChange(it)
+            onRegisterPasswordChange(it)
 
         },
         label = {
@@ -166,23 +165,4 @@ fun LoginPasswordInput(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-
-
-
-}
-
-@Composable
-fun ResultView(success : Boolean) {
-
-
-    Column(modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if(success){
-            Text(text = "True")
-        }else{
-            Text(text = "False")
-        }
-    }
 }

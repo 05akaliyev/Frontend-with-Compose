@@ -2,6 +2,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,7 +38,10 @@ fun ShowAllNurses(navController: NavController, viewModel: AppViewModel){
         Text(text = "List of all Nurses:", fontSize = 28.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier.fillMaxHeight(0.75f) // Ajusta el tamaño de la lista al 50% de la pantalla
+
+        ){
             items(nurses){ nurse ->
                 NurseItem(nurse = nurse)
 
@@ -46,6 +50,9 @@ fun ShowAllNurses(navController: NavController, viewModel: AppViewModel){
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        Button(onClick = { navController.navigate("FindByName") }) {
+            Text("Find Nurse by Name")
+        }
         Button(onClick = { navController.navigate("Home") }) {
             Text("Home")
         }
@@ -65,7 +72,6 @@ fun ShowAllNurses(navController: NavController, viewModel: AppViewModel){
 @Composable
 fun NurseItem(nurse: Nurse) {
     Column(
-        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

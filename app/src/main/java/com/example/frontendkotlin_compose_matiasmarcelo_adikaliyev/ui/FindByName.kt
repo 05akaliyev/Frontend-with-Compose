@@ -59,7 +59,9 @@ fun findNurses(navController: NavController, viewModel: AppViewModel) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
+        Button(onClick = { navController.navigate("GetAll") }) {
+            Text("List All Nurses")
+        }
         Button(onClick = { navController.navigate("Home") }) {
             Text("Home")
         }
