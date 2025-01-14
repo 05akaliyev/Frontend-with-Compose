@@ -69,7 +69,9 @@ fun findNurses(navController: NavController, viewModel: AppViewModel) {
             Button(onClick = { navController.navigate("GetAll") }) {
                 Text("List All Nurses")
             }
-            Button(onClick = { navController.navigate("Home") }) {
+            Button(onClick = {
+                viewModel.logout()
+                navController.navigate("Home") }) {
                 Text("Home")
             }
         }
