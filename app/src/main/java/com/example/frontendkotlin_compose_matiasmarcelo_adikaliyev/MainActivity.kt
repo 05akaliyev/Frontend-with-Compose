@@ -3,6 +3,7 @@ package com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev
 import LoginPageForm
 import ShowAllNurses
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -23,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -32,6 +37,11 @@ import findNurses
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Path
 
 //
 
@@ -65,9 +75,51 @@ class AppViewModel: ViewModel(){
               }
           )
       }
+    var remoteMessageUiState: RemoteMessageUiState
+            by mutableStateOf(RemoteMessageUiState.Cargant)
+    private set
+
+    fun getRemoteMessage(){
+        viewModelScope.launch {
+            remoteMessageUiState=RemoteMessageUiState.Cargant
+            try{
+                // Crea la conexión de Retrofit
+                val connexio = Retrofit.Builder()
+                    .baseUrl("http://10.0.2.2:8080")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                // Crea la instancia de la interfaz RemoteMessageInterface
+                val endPoint = connexio.create(RemoteMessageInterface ::class.java)
+                //Hace llamada a la API
+                val resposta = endPoint.getRemoteMessage(1) //Pasa id 1 como ejemplo
+                // Aquí imprimes el resultado en el log
+                Log.d("APIResponse", "Respuesta: ${resposta.user}")
+                //Debido a que Success espera un infoUiState. Se envuelve resposta para que solo devuelva una lista con el nurse enviado (1)
+                val infoState = InfoUiState(nurses = arrayListOf(resposta))
+
+                remoteMessageUiState=RemoteMessageUiState.Success(infoState)
+            } catch (e: Exception) {
+                Log.d("exemple", "RESPOSTA ERROR ${e.message} ${e.printStackTrace()}")
+                remoteMessageUiState= RemoteMessageUiState.Error
+            }
+        }
+    }
 
 
 }
+sealed interface RemoteMessageUiState {
+    data class Success(
+        val remoteMessage: InfoUiState) : RemoteMessageUiState
+    object Error : RemoteMessageUiState
+    object Cargant : RemoteMessageUiState
+}
+
+interface RemoteMessageInterface {
+    @GET("nurses/{id}")
+    suspend fun getRemoteMessage(@Path("id")id:Int): Nurse
+}
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,6 +182,10 @@ fun InitialPage(){
                 }
                 Button(onClick = { navController.navigate("Login") }) {
                     Text("Login")
+                }
+
+                Button(onClick = {viewModel.getRemoteMessage() }){
+                    Text("faffafa")
                 }
 //                Button(onClick = { navController.navigate("GetAll")}) {
 //                    Text("Get All")
