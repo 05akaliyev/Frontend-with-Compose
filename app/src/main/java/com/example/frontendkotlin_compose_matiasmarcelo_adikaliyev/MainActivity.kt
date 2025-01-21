@@ -33,6 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.RegisterpageForm
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.theme.FrontendKotlinCompose_MatiasMarcelo_AdiKaliyevTheme
+import com.google.firebase.messaging.RemoteMessage
 import findNurses
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,14 +41,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.Headers
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 //
 
 // Lista estática de enfermeras
-class Nurse(var user:String, var password:String)
-
+class Nurse(var id:Int = 0, var user:String, var password:String)
 
 data class InfoUiState(val nurses: ArrayList<Nurse> = ArrayList<Nurse>())
 
@@ -55,9 +60,9 @@ class AppViewModel: ViewModel(){
     private val _uiState = MutableStateFlow(
         InfoUiState(
             nurses = arrayListOf(
-                Nurse("Alberto", "password1"),
-                Nurse("Maria", "password2"),
-                Nurse("Juan", "password3")
+                Nurse(1,"Alberto", "password1"),
+                Nurse(2,"Maria", "password2"),
+                Nurse(3,"Juan", "password3")
             )
         )
     )
@@ -78,16 +83,18 @@ class AppViewModel: ViewModel(){
     var remoteMessageUiState: RemoteMessageUiState
             by mutableStateOf(RemoteMessageUiState.Cargant)
     private set
+    // Crea la conexión de Retrofit
+    val connexio = Retrofit.Builder()
+        .baseUrl("http://10.0.2.2:8080")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
 
     fun getRemoteMessage(){
         viewModelScope.launch {
             remoteMessageUiState=RemoteMessageUiState.Cargant
             try{
-                // Crea la conexión de Retrofit
-                val connexio = Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:8080")
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build()
+
 
                 // Crea la instancia de la interfaz RemoteMessageInterface
                 val endPoint = connexio.create(RemoteMessageInterface ::class.java)
@@ -107,17 +114,52 @@ class AppViewModel: ViewModel(){
     }
 
 
+//REVISAR, HE AÑADIDO ID AL data class de Nurse. RegisterPage raro pero funciona.
+    fun postRemoteMessage(user: String, password: String){
+
+        viewModelScope.launch {
+            remoteMessageUiState=RemoteMessageUiState.Cargant
+            try{
+                val endPoint = connexio.create(RemoteMessageInterface::class.java)
+                val resposta = endPoint.postRemoteMessage(user, password)
+                Log.d("exemple", "RESPOSTA ${resposta.id}")
+                val infoState = InfoUiState(nurses = arrayListOf(resposta))
+                remoteMessageUiState=RemoteMessageUiState.Success(infoState)
+
+            } catch (e: Exception) {
+                Log.d("exemple", "RESPOSTA ERROR ${e.message} ${e.printStackTrace()}")
+                remoteMessageUiState= RemoteMessageUiState.Error
+
+            }
+        }
+
+    }
+
+    fun logout(){
+        remoteMessageUiState = RemoteMessageUiState.Error
+
+    }
+
+
+
 }
 sealed interface RemoteMessageUiState {
     data class Success(
         val remoteMessage: InfoUiState) : RemoteMessageUiState
+
     object Error : RemoteMessageUiState
     object Cargant : RemoteMessageUiState
 }
 
 interface RemoteMessageInterface {
+    @Headers("Accept: application/json","Content-Type: application/json")
     @GET("nurses/{id}")
     suspend fun getRemoteMessage(@Path("id")id:Int): Nurse
+    @FormUrlEncoded
+    @POST("nurses/login")
+    suspend fun postRemoteMessage(
+        @Field("user") user: String,
+        @Field("password") password: String):Nurse
 }
 
 

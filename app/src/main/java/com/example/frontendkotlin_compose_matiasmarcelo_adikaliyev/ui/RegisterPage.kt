@@ -74,9 +74,12 @@ fun RegisterpageForm(navController: NavController, viewModel: AppViewModel){
         )
 
         Button(onClick = {
-
+//Nurse no crea un id, se crea en la base de datos
             if (registerUserInput.isNotBlank() && registerPasswordInput.isNotBlank()) {
-                val nurse = Nurse(user = registerUserInput, password = registerPasswordInput)
+                val nurse = Nurse(
+                    user = registerUserInput, password = registerPasswordInput
+
+                )
                 viewModel.addNurse(nurse)
                 navController.navigate("GetAll")
                 registerResult = true

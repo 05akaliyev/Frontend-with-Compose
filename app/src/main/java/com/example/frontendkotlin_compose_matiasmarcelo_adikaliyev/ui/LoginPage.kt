@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,12 +32,17 @@ import androidx.navigation.NavController
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.AppViewModel
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.Nurse
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.R
+import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.RemoteMessageUiState
+import com.google.firebase.messaging.remoteMessage
+import kotlinx.coroutines.flow.StateFlow
+import org.w3c.dom.Text
 
 //Login
 //
 @Composable
 fun LoginPageForm(navController: NavController,viewModel: AppViewModel){
-    val viewMdppViewModel = viewModel
+    val remoteMessageUiState = viewModel.remoteMessageUiState
+
     var nurses:ArrayList<Nurse> = viewModel.uiState.collectAsState().value.nurses
 
     var loginInput by remember{
@@ -59,6 +66,11 @@ fun LoginPageForm(navController: NavController,viewModel: AppViewModel){
         mutableStateOf<Boolean>(value = false)
     }
 
+    LaunchedEffect(remoteMessageUiState) {
+        if (remoteMessageUiState is RemoteMessageUiState.Success) {
+            navController.navigate("GetAll")
+        }
+    }
     Column(modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -82,16 +94,11 @@ fun LoginPageForm(navController: NavController,viewModel: AppViewModel){
 
         Button(onClick = {
 
-            loginResult = nurses.any{it.user == loginInput && it.password == passwordInput}
-
-            if (loginResult == true){
-                navController.navigate("GetAll")
-                //ResultView(success = loginResult == true)
-            }else{
-                loginResult == false
+           viewModel.postRemoteMessage(loginInput, passwordInput)
 
 
-            }
+
+
 
         }, modifier = Modifier, colors = ButtonDefaults.buttonColors(
 
@@ -104,7 +111,13 @@ fun LoginPageForm(navController: NavController,viewModel: AppViewModel){
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { navController.navigate("Home") }) {
+        Button(onClick = {
+            viewModel.logout()
+            navController.navigate("Home")
+
+        }
+
+        ) {
             Text("Home")
         }
 
