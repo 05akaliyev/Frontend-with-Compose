@@ -12,6 +12,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,11 +32,13 @@ import androidx.navigation.NavController
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.AppViewModel
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.Nurse
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.R
+import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.RemoteMessageUiState
 
 @Composable
 fun RegisterpageForm(navController: NavController, viewModel: AppViewModel){
     val viewModel: AppViewModel = viewModel
     var nurses:ArrayList<Nurse> = viewModel.uiState.collectAsState().value.nurses
+    val remoteMessageUiState = viewModel.remoteMessageUiState
 
     var registerUserInput by remember {
         mutableStateOf<String>(value = "")
@@ -53,6 +56,11 @@ fun RegisterpageForm(navController: NavController, viewModel: AppViewModel){
         mutableStateOf<Boolean?>(value = null)
     }
 
+    LaunchedEffect(remoteMessageUiState) {
+        if (remoteMessageUiState is RemoteMessageUiState.Success) {
+            navController.navigate("GetAll")
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -74,14 +82,16 @@ fun RegisterpageForm(navController: NavController, viewModel: AppViewModel){
         )
 
         Button(onClick = {
-//Nurse no crea un id, se crea en la base de datos
+
             if (registerUserInput.isNotBlank() && registerPasswordInput.isNotBlank()) {
-                val nurse = Nurse(
+                viewModel.postRemoteMessageRegister(registerUserInput,registerPasswordInput)
+
+                /*val nurse = Nurse(
                     user = registerUserInput, password = registerPasswordInput
 
                 )
                 viewModel.addNurse(nurse)
-                navController.navigate("GetAll")
+                navController.navigate("GetAll")*/
                 registerResult = true
             } else {
                 registerResult = false
@@ -104,6 +114,7 @@ fun RegisterpageForm(navController: NavController, viewModel: AppViewModel){
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = { navController.navigate("Home") }) {
+            viewModel.logout()
             Text("Home")
         }
 

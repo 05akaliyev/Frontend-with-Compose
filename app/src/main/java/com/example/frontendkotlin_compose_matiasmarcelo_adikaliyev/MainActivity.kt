@@ -114,7 +114,6 @@ class AppViewModel: ViewModel(){
     }
 
 
-//REVISAR, HE AÑADIDO ID AL data class de Nurse. RegisterPage raro pero funciona.
     fun postRemoteMessage(user: String, password: String){
 
         viewModelScope.launch {
@@ -123,6 +122,26 @@ class AppViewModel: ViewModel(){
                 val endPoint = connexio.create(RemoteMessageInterface::class.java)
                 val resposta = endPoint.postRemoteMessage(user, password)
                 Log.d("exemple", "RESPOSTA ${resposta.id}")
+                val infoState = InfoUiState(nurses = arrayListOf(resposta))
+                remoteMessageUiState=RemoteMessageUiState.Success(infoState)
+
+            } catch (e: Exception) {
+                Log.d("exemple", "RESPOSTA ERROR ${e.message} ${e.printStackTrace()}")
+                remoteMessageUiState= RemoteMessageUiState.Error
+
+            }
+        }
+
+    }
+
+    fun postRemoteMessageRegister(user: String, password: String){
+
+        viewModelScope.launch {
+            remoteMessageUiState=RemoteMessageUiState.Cargant
+            try{
+                val endPoint = connexio.create(RemoteMessageInterface::class.java)
+                val resposta = endPoint.postRemoteMessageRegister(user, password)
+
                 val infoState = InfoUiState(nurses = arrayListOf(resposta))
                 remoteMessageUiState=RemoteMessageUiState.Success(infoState)
 
@@ -160,6 +179,13 @@ interface RemoteMessageInterface {
     suspend fun postRemoteMessage(
         @Field("user") user: String,
         @Field("password") password: String):Nurse
+
+    @FormUrlEncoded
+    @POST("nurses/")
+    suspend fun postRemoteMessageRegister(
+        @Field("user") user : String,
+        @Field("password") password: String
+    ):Nurse
 }
 
 
