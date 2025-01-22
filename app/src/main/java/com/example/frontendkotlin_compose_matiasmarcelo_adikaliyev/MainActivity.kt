@@ -28,9 +28,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.ProfileInfo
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.RegisterpageForm
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.theme.FrontendKotlinCompose_MatiasMarcelo_AdiKaliyevTheme
 import com.google.firebase.messaging.RemoteMessage
@@ -195,7 +197,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FrontendKotlinCompose_MatiasMarcelo_AdiKaliyevTheme {
-                InitialPage()
+                ProfileInfo()
             }
         }
     }
