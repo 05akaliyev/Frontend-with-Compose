@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,6 +49,19 @@ fun RegisterpageForm(navController: NavController, viewModel: AppViewModel){
         mutableStateOf<String>(value = "")
 
     }
+
+    var registerPhoneNumberInput by remember {
+        mutableStateOf<Int?>(value = null)
+    }
+
+    var registerFirstNameInput by remember {
+        mutableStateOf<String>(value = "")
+    }
+
+    var registerLastNameInput by remember {
+        mutableStateOf<String>(value = "")
+    }
+
     var passwordIsVisible by remember {
         mutableStateOf<Boolean>(value = false)
     }
@@ -81,10 +95,30 @@ fun RegisterpageForm(navController: NavController, viewModel: AppViewModel){
             passwordIsVisible = passwordIsVisible
         )
 
+        RegisterPhoneNumberInput(
+            registerPhoneNumberInput = registerPhoneNumberInput,
+            onRegisterPhoneNumberChange = {registerPhoneNumberInput = it}
+        )
+
+        RegisterFirstNameInput(
+            registerFirstNameInput = registerFirstNameInput,
+            onRegisterFirstNameChange = {registerFirstNameInput = it}
+
+        )
+
+        RegisterLastNameInput(
+            registerLastNameInput = registerLastNameInput,
+            onRegisterLastNameChange = {registerLastNameInput = it}
+
+        )
+
         Button(onClick = {
 
             if (registerUserInput.isNotBlank() && registerPasswordInput.isNotBlank()) {
-                viewModel.postRemoteMessageRegister(registerUserInput,registerPasswordInput)
+                registerPhoneNumberInput?.let {
+                    viewModel.postRemoteMessageRegister(registerUserInput,registerPasswordInput,
+                        it, registerFirstNameInput, registerLastNameInput)
+                }
 
                 /*val nurse = Nurse(
                     user = registerUserInput, password = registerPasswordInput
@@ -177,6 +211,65 @@ fun RegisterPasswordInput(registerPasswordInput : String, labelId : String = "Pa
     )
 
 
-    Spacer(modifier = Modifier.height(16.dp))
 
+}
+
+@Composable
+fun RegisterPhoneNumberInput(registerPhoneNumberInput : Int?, onRegisterPhoneNumberChange: (Int?) -> Unit){
+    OutlinedTextField(
+        value = registerPhoneNumberInput?.toString() ?: "",
+        onValueChange = {
+            onRegisterPhoneNumberChange(it.toIntOrNull())
+
+        },
+        label = {
+
+            Text(text = "Phone Number")
+        },
+        singleLine = true
+
+    )
+
+
+
+}
+
+@Composable
+fun RegisterFirstNameInput(registerFirstNameInput : String, onRegisterFirstNameChange: (String) -> Unit){
+    OutlinedTextField(
+        value = registerFirstNameInput,
+        onValueChange = {
+            onRegisterFirstNameChange(it)
+
+        },
+        label = {
+
+            Text(text = "First Name")
+        },
+        singleLine = true
+
+    )
+
+
+
+}
+
+@Composable
+fun RegisterLastNameInput(registerLastNameInput : String, onRegisterLastNameChange: (String) -> Unit){
+    OutlinedTextField(
+        value = registerLastNameInput,
+        onValueChange = {
+            onRegisterLastNameChange(it)
+
+        },
+        label = {
+
+            Text(text = "Last Name")
+        },
+        singleLine = true
+
+    )
+
+
+    Spacer(modifier = Modifier.height(16.dp))
 }

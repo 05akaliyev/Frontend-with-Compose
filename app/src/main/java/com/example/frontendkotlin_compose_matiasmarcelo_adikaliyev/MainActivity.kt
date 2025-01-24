@@ -54,18 +54,18 @@ import retrofit2.http.Path
 //
 
 // Lista estática de enfermeras
-class Nurse(var id:Int = 0, var user:String, var password:String)
+class Nurse(var id:Int = 0, var user:String, var password:String, var first_name:String, var last_name:String, var phone_number:Int)
 
 data class InfoUiState(val nurses: ArrayList<Nurse> = ArrayList<Nurse>())
 
 class AppViewModel: ViewModel(){
     private val _uiState = MutableStateFlow(
         InfoUiState(
-            nurses = arrayListOf(
-                Nurse(1,"Alberto", "password1"),
-                Nurse(2,"Maria", "password2"),
-                Nurse(3,"Juan", "password3")
-            )
+//            nurses = arrayListOf(
+//                Nurse(1,"Alberto", "password1"),
+//                Nurse(2,"Maria", "password2"),
+//                Nurse(3,"Juan", "password3")
+//            )
         )
     )
     val uiState:StateFlow<InfoUiState> get() = _uiState.asStateFlow()
@@ -136,13 +136,13 @@ class AppViewModel: ViewModel(){
 
     }
 
-    fun postRemoteMessageRegister(user: String, password: String){
+    fun postRemoteMessageRegister(user: String, password: String, phone_number: Int, first_name: String, last_name: String){
 
         viewModelScope.launch {
             remoteMessageUiState=RemoteMessageUiState.Cargant
             try{
                 val endPoint = connexio.create(RemoteMessageInterface::class.java)
-                val resposta = endPoint.postRemoteMessageRegister(user, password)
+                val resposta = endPoint.postRemoteMessageRegister(user, password, phone_number, first_name, last_name)
 
                 val infoState = InfoUiState(nurses = arrayListOf(resposta))
                 remoteMessageUiState=RemoteMessageUiState.Success(infoState)
@@ -186,7 +186,10 @@ interface RemoteMessageInterface {
     @POST("nurses/")
     suspend fun postRemoteMessageRegister(
         @Field("user") user : String,
-        @Field("password") password: String
+        @Field("password") password: String,
+        @Field("phone_number") phone_number:Int,
+        @Field("first_name") first_name: String,
+        @Field("last_name") last_name: String
     ):Nurse
 }
 
@@ -197,7 +200,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FrontendKotlinCompose_MatiasMarcelo_AdiKaliyevTheme {
-                ProfileInfo()
+                InitialPage()
             }
         }
     }
