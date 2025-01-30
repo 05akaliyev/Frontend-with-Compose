@@ -117,7 +117,6 @@ class AppViewModel: ViewModel(){
 
 
     fun postRemoteMessage(user: String, password: String){
-
         viewModelScope.launch {
             remoteMessageUiState=RemoteMessageUiState.Cargant
             try{
@@ -126,14 +125,11 @@ class AppViewModel: ViewModel(){
                 Log.d("exemple", "RESPOSTA ${resposta.id}")
                 val infoState = InfoUiState(nurses = arrayListOf(resposta))
                 remoteMessageUiState=RemoteMessageUiState.Success(infoState)
-
             } catch (e: Exception) {
                 Log.d("exemple", "RESPOSTA ERROR ${e.message} ${e.printStackTrace()}")
                 remoteMessageUiState= RemoteMessageUiState.Error
-
             }
         }
-
     }
 
     fun postRemoteMessageRegister(user: String, password: String, phone_number: Int, first_name: String, last_name: String){
@@ -156,7 +152,23 @@ class AppViewModel: ViewModel(){
 
     }
 
-    fun logout(){
+    fun fetchAllNurses() {
+        viewModelScope.launch {
+            try {
+                val endPoint = connexio.create(RemoteMessageInterface::class.java)
+                val response = endPoint.getAllNurses()
+                val infoState = InfoUiState(nurses = ArrayList(response))
+                remoteMessageUiState = RemoteMessageUiState.Success(infoState)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
+
+
+        fun logout(){
         remoteMessageUiState = RemoteMessageUiState.Error
 
     }
@@ -191,6 +203,10 @@ interface RemoteMessageInterface {
         @Field("first_name") first_name: String,
         @Field("last_name") last_name: String
     ):Nurse
+
+
+    @GET("nurses/index")
+    suspend fun getAllNurses(): List<Nurse>
 }
 
 

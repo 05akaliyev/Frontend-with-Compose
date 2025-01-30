@@ -93,12 +93,7 @@ fun LoginPageForm(navController: NavController,viewModel: AppViewModel){
         )
 
         Button(onClick = {
-
            viewModel.postRemoteMessage(loginInput, passwordInput)
-
-
-
-
 
         }, modifier = Modifier, colors = ButtonDefaults.buttonColors(
 
