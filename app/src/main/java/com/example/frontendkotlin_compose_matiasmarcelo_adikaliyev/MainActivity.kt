@@ -36,6 +36,7 @@ import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.ProfileInf
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.RegisterpageForm
 import com.example.frontendkotlin_compose_matiasmarcelo_adikaliyev.ui.theme.FrontendKotlinCompose_MatiasMarcelo_AdiKaliyevTheme
 import com.google.firebase.messaging.RemoteMessage
+import com.google.firebase.messaging.remoteMessage
 import findNurses
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -58,6 +59,7 @@ class Nurse(var id:Int = 0, var user:String, var password:String, var first_name
 
 data class InfoUiState(val nurses: ArrayList<Nurse> = ArrayList<Nurse>())
 
+var currentUserId: Int? = null
 class AppViewModel: ViewModel(){
     private val _uiState = MutableStateFlow(
         InfoUiState(
@@ -92,7 +94,7 @@ class AppViewModel: ViewModel(){
         .build()
 
 
-    fun getRemoteMessage(){
+    fun getRemoteMessage(id: Int){
         viewModelScope.launch {
             remoteMessageUiState=RemoteMessageUiState.Cargant
             try{
@@ -101,7 +103,7 @@ class AppViewModel: ViewModel(){
                 // Crea la instancia de la interfaz RemoteMessageInterface
                 val endPoint = connexio.create(RemoteMessageInterface ::class.java)
                 //Hace llamada a la API
-                val resposta = endPoint.getRemoteMessage(1) //Pasa id 1 como ejemplo
+                val resposta = endPoint.getRemoteMessage(id) //Pasa id 1 como ejemplo
                 // Aquí imprimes el resultado en el log
                 Log.d("APIResponse", "Respuesta: ${resposta.user}")
                 //Debido a que Success espera un infoUiState. Se envuelve resposta para que solo devuelva una lista con el nurse enviado (1)
@@ -123,6 +125,8 @@ class AppViewModel: ViewModel(){
                 val endPoint = connexio.create(RemoteMessageInterface::class.java)
                 val resposta = endPoint.postRemoteMessage(user, password)
                 Log.d("exemple", "RESPOSTA ${resposta.id}")
+                // GUARDAS el ID
+                currentUserId = resposta.id
                 val infoState = InfoUiState(nurses = arrayListOf(resposta))
                 remoteMessageUiState=RemoteMessageUiState.Success(infoState)
             } catch (e: Exception) {
@@ -140,6 +144,9 @@ class AppViewModel: ViewModel(){
                 val endPoint = connexio.create(RemoteMessageInterface::class.java)
                 val resposta = endPoint.postRemoteMessageRegister(user, password, phone_number, first_name, last_name)
 
+                Log.d("exemple", "RESPOSTA ${resposta.id}")
+                // GUARDAS el ID
+                currentUserId = resposta.id
                 val infoState = InfoUiState(nurses = arrayListOf(resposta))
                 remoteMessageUiState=RemoteMessageUiState.Success(infoState)
 
@@ -253,6 +260,17 @@ fun InitialPage(){
 
         }
 
+        // NEW: Profile route
+        composable("ProfileInfo") {
+            currentUserId?.let { it1 ->
+                ProfileInfo(
+                    navController, viewModel,
+                    id = it1,
+                )
+            }
+
+        }
+
         composable("Home") {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -273,9 +291,7 @@ fun InitialPage(){
                     Text("Login")
                 }
 
-                Button(onClick = {viewModel.getRemoteMessage() }){
-                    Text("faffafa")
-                }
+
 //                Button(onClick = { navController.navigate("GetAll")}) {
 //                    Text("Get All")
 //                }
